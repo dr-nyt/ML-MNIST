@@ -6,7 +6,6 @@ from pygame.locals import *
 import pygame
 import sys
 import numpy as np
-# np.set_printoptions(threshold=sys.maxsize)
 
 WINDOW_SIZE_X = 640
 WINDOW_SIZE_Y = 480
@@ -83,24 +82,27 @@ while True:
             image_array = np.array(pygame.PixelArray(DISPLAY_SURFACE))
             pprint(image_array.shape)
             # Isolate the values inside the bounding box
-            image_array = image_array[rect_min_x:rect_max_x,
-                                      rect_min_y:rect_max_y]
+            image_array = image_array[
+                rect_min_x:rect_max_x,
+                rect_min_y:rect_max_y
+            ]
             pprint(image_array.shape)
             # Transpose and convert the values to float
             image_array = image_array.T.astype(np.float32)
+            # Add padding around the image
+            image = np.pad(
+                image_array, (50, 50),
+                "constant", constant_values=0
+            )
+            # Resize image to be 28x28 and normalized
+            image = cv2.resize(image, (28, 28)) / 255
 
             if IMAGE_SAVE:
-                cv2.imwrite("image.png", image_array)
+                cv2.imwrite(f"img/image-{image_count}.png", image_array)
                 image_count += 1
 
             if PREDICT:
                 # image = cv2.resize(image_array, (28, 28))
-                image = np.pad(
-                    image_array, (10, 10),
-                    "constant", constant_values=0
-                )
-                image = cv2.resize(image, (28, 28)) / 255
-
                 label = LABELS[
                     np.argmax(MODEL.predict(image.reshape(1, 28, 28, 1)))
                 ]
@@ -110,7 +112,8 @@ while True:
                     (rect_min_x, rect_min_y), (rect_max_x - rect_min_x, rect_max_y - rect_min_y))
                 # text_rectangle.left, text_rectangle.right = rect_min_x, rect_max_y
 
-                DISPLAY_SURFACE.blit(text_surface, text_rectangle)
+                DISPLAY_SURFACE.blit(
+                    text_surface, (rect_min_x, max(rect_min_y - 18, 0)))
 
         if event.type == KEYDOWN:
             if event.unicode == "n":
