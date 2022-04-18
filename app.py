@@ -16,7 +16,7 @@ RED = (255, 0, 0)
 
 IMAGE_SAVE = True
 PREDICT = True
-MODEL = load_model("bestmodel.h5")
+MODEL = load_model("final_model.h5")
 
 LABELS = {
     0: "Zero", 1: "One", 2: "Two", 3: "Three", 4: "Four",
